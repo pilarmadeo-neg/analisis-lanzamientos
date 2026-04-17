@@ -791,11 +791,31 @@ OUTPUT = 'analisis_lanzamientos.html'
 # The HTML_BODY is built using the CSS, JSDATA, and JSCODE variables.
 # See full implementation in the repository.
 
-# ── Write output ──────────────────────────────────────────────────
-# HTML = HTML_BODY  (assembled from CSS + JSDATA + JSCODE)
-# with open(OUTPUT, 'w', encoding='utf-8') as f:
-#     f.write(HTML)
+# ── Write output ────────────────────────────────────────────────────────────────
+
+OUTPUT = 'analisis_lanzamientos.html'
+
+HTML = HTML_BODY  # assembled from CSS + JSDATA + JSCODE
+
+with open(OUTPUT, 'w', encoding='utf-8') as f:
+    f.write(HTML)
+
+# ── Upload to GCS ────────────────────────────────────────────────────────────────
+
+GCS_BUCKET = os.environ.get('GCS_BUCKET', 'negocio-display-reportes')
+GCS_OBJECT = 'analisis-lanzamientos/reporte.html'
+
+try:
+    from google.cloud import storage as gcs
+    gcs_client = gcs.Client()
+    bucket     = gcs_client.bucket(GCS_BUCKET)
+    blob       = bucket.blob(GCS_OBJECT)
+    blob.upload_from_filename(OUTPUT, content_type='text/html')
+    blob.make_public()
+    print(f"\u2705  GCS: https://storage.googleapis.com/{GCS_BUCKET}/{GCS_OBJECT}")
+except Exception as e:
+    print(f"\u26a0\ufe0f  GCS upload fall\u00f3: {e}")
 
 total_s = round(time.time() - _t0, 1)
-print(f"✅  Output: {OUTPUT}")
+print(f"\u2705  Output: {OUTPUT}")
 print(f"   Tiempo total: {total_s}s")
