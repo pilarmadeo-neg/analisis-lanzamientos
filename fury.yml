@@ -1,0 +1,12 @@
+id: analisis-lanzamientos
+type: cronjob
+language: python
+runtime: 3.11
+
+cronjobs:
+  - id: generar-reporte
+      schedule: "0 9 * * *"
+          command: python analisis_lanzamientos.py
+              envvars:
+                    - id: GCS_BUCKET
+                            value: negocio-display-reportes
